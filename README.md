@@ -63,16 +63,9 @@ see `https://www.arduino.cc/en/guide/libraries`
     or [master](archive/master.zip) .
 2. Import the zip from Arduino IDE
 
-    ![install-ide-import-lib](https://user-images.githubusercontent.com/48547675/55043017-9a34e980-5077-11e9-885d-03f9f82e3491.JPG)
-
-    ![install-select-zip](https://user-images.githubusercontent.com/48547675/55043034-a7ea6f00-5077-11e9-99d5-26423fb652b5.JPG)
-
 3. Then, you can see the samples in `File >> Examples` menu.
-
-    ![install-select-examples](https://user-images.githubusercontent.com/48547675/55043028-a28d2480-5077-11e9-8365-6745cda417ff.JPG)
-
+   
 4. Select examples for your favorite sensors, build and program to boards.
-
 
 ## Dependencies
 None
