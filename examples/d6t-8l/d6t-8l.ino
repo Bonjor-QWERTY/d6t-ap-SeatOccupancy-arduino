@@ -33,26 +33,23 @@
 #define N_PIXEL 8
 
 #define N_READ ((N_PIXEL + 1) * 2 + 1)
-//add
+/***** Setting Parameter *****/
 #define comparingNumInc 6 // x250 ms   (example) 6 -> 1.5 sec
 #define comparingNumDec 6  // x250 ms   (example) 6 -> 1.5 sec
 #define threshHoldInc 10 //  /10 degC   (example) 10 -> 1.0 degC
 #define threshHoldDec 5 //  /10 degC   (example) 5 -> 0.5 degC
-// add end
+bool  enablePix[8] = {true, true, true, true, true, true, true, true};
+/****************************/
 
 uint8_t rbuf[N_READ];
-//add
-int16_t pix_data[8] = {0}; // add2
-bool  enablePix[8] = {true, true, true, true, true, true, true, true};
+int16_t pix_data[8] = {0};
 int16_t seqData[8][40] = {0};
 bool  occuPix[8] = {0};
 bool  occuPixFlag = false;
 uint8_t  resultOccupancy = 0;
 uint16_t  totalCount = 0;
-// add end
 
-/** JUDGE_occupancy: judge occupancy
-*/
+/** JUDGE_occupancy: judge occupancy*/
 bool judge_seatOccupancy(void) { 
   int i = 0;
   int j = 0; 
