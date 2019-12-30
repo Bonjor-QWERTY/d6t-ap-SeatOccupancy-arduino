@@ -37,7 +37,7 @@
 #define comparingNumInc 6 // x250 ms   (example) 6 -> 1.5 sec
 #define comparingNumDec 6  // x250 ms   (example) 6 -> 1.5 sec
 #define threshHoldInc 10 //  /10 degC   (example) 10 -> 1.0 degC
-#define threshHoldDec 5 //  /10 degC   (example) 5 -> 0.5 degC
+#define threshHoldDec 10 //  /10 degC   (example) 10 -> 1.0 degC
 bool  enablePix[8] = {true, true, true, true, true, true, true, true};
 /****************************/
 
