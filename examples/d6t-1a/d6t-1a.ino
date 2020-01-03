@@ -33,8 +33,60 @@
 #define N_PIXEL 1
 
 #define N_READ ((N_PIXEL + 1) * 2 + 1)
-uint8_t rbuf[N_READ];
+/***** Setting Parameter *****/
+#define comparingNumInc 8 // x200 ms   (example) 8 -> 1.6 sec
+#define comparingNumDec 8  // x200 ms   (example) 8 -> 1.6 sec
+#define threshHoldInc 10 //  /10 degC   (example) 10 -> 1.0 degC
+#define threshHoldDec 10 //  /10 degC   (example) 10 -> 1.0 degC
+//bool  enablePix[8] = {true, true, true, true, true, true, true, true};
+/****************************/
 
+uint8_t rbuf[N_READ];
+int16_t pix_data = 0;
+int16_t seqData[40] = {0};
+bool  occuPix = 0;
+bool  occuPixFlag = false;
+uint8_t  resultOccupancy = 0;
+uint16_t  totalCount = 0;
+
+/** JUDGE_occupancy: judge occupancy*/
+bool judge_seatOccupancy(void) { 
+  int j = 0; 
+  for (j = 0; j < 39; j++){
+    seqData[39 - j] = seqData[38 - j];
+  }
+  seqData[0] = pix_data;            
+  if (totalCount <= comparingNumInc){
+    totalCount++;
+  }
+  if (totalCount > comparingNumInc){    
+    if (occuPix == false){
+      if (seqData[0] - seqData[comparingNumInc] > threshHoldInc){
+        occuPix = true;
+      }
+    }
+    else{   //resultOccupancy == true
+      if (seqData[comparingNumDec] - seqData[0] > threshHoldDec){
+        occuPix = false;
+      }
+    }
+    if (resultOccupancy == 0) {                
+        if(occuPix == true){
+          resultOccupancy = 1;
+        }
+    }
+    else{
+      occuPixFlag = false;
+      if (occuPix == true){
+        occuPixFlag = true;
+      }
+      if (occuPixFlag == false){
+        resultOccupancy = 0;
+      }
+    }
+  }
+  return true;
+}
 
 uint8_t calc_crc(uint8_t data) {
     int index;
@@ -116,18 +168,23 @@ void loop() {
     // 1st data is PTAT measurement (: Proportional To Absolute Temperature)
     int16_t itemp = conv8us_s16_le(rbuf, 0);
     Serial.print("PTAT:");
-    Serial.println(itemp / 10.0, 1);
+    Serial.print(itemp / 10.0, 1);
+    Serial.print(", Temperature:");
 
     // loop temperature pixels of each thrmopiles measurements
     for (i = 0, j = 2; i < N_PIXEL; i++, j += 2) {
         itemp = conv8us_s16_le(rbuf, j);
+        pix_data = itemp;
         Serial.print(itemp / 10.0, 1);  // print PTAT & Temperature
         if ((i % N_ROW) == N_ROW - 1) {
-            Serial.println(" [degC]");  // wrap text at ROW end.
+            Serial.print(" [degC]");  // wrap text at ROW end.
         } else {
             Serial.print(",");   // print delimiter
         }
     }
-    delay(1000);
+    judge_seatOccupancy(); //add
+    Serial.print(", Occupancy:");
+    Serial.println(resultOccupancy, 1);
+    delay(200);
 }
 // vi: ft=arduino:fdm=marker:et:sw=4:tw=80
