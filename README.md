@@ -18,7 +18,7 @@ sample projects output the sensor data to USB-Serial ports.
 |:-------:|:---------------------------|:--------|:-----------------------------------------|
 | d6t-1a  | for the element type 1x1   | Arduino |                Available                 |
 | d6t-8l  | for the element type 1x8   | Arduino |                Available                 |
-| d6t-44l | for the element type 4x4   | Arduino |:-----------------------------------------|
+| d6t-44l | for the element type 4x4   | Arduino |                Available                 |
 | d6t-32l | for the element type 32x32 | Arduino |:-----------------------------------------|
 
 
