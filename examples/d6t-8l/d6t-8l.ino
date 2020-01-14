@@ -66,13 +66,13 @@ bool judge_seatOccupancy(void) {
     for (i = 0; i < 8; i++){
       if (enablePix[i] == true){
         if (occuPix[i] == false){
-          if (seqData[i][0] - seqData[i][comparingNumInc] > threshHoldInc){
+           if ((int16_t)(seqData[i][0] - seqData[i][comparingNumInc]) > (int16_t)threshHoldInc){
             occuPix[i] = true;
           }
         }
-        else{   //resultOccupancy == true
-          if (seqData[i][comparingNumDec] - seqData[i][0] > threshHoldDec){
-            occuPix[i] = false;
+        else{   
+		  if ((int16_t)(seqData[i][comparingNumDec] - seqData[i][0]) > (int16_t)threshHoldDec){
+			occuPix[i] = false;
           }
         }
       }
@@ -85,7 +85,7 @@ bool judge_seatOccupancy(void) {
         }
       }
     }
-    else{
+    else{  //resultOccupancy == true
       occuPixFlag = false;
       for (i = 0; i < 8; i++){
         if (occuPix[i] == true){
@@ -220,7 +220,7 @@ void loop() {
     // loop temperature pixels of each thrmopiles measurements
     for (i = 0, j = 2; i < N_PIXEL; i++, j += 2) {
         itemp = conv8us_s16_le(rbuf, j);
-        pix_data[j - 2] = itemp;
+        pix_data[i] = itemp;
         Serial.print(itemp / 10.0, 1);  // print PTAT & Temperature
         if ((i % N_ROW) == N_ROW - 1) {
             Serial.print(" [degC]");  // wrap text at ROW end.
