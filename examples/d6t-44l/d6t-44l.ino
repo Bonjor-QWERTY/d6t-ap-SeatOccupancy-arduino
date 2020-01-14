@@ -29,12 +29,79 @@
 #define D6T_ADDR 0x0A  // for I2C 7bit address
 #define D6T_CMD 0x4C  // for D6T-44L-06/06H, D6T-8L-09/09H, for D6T-1A-01/02
 
-#define N_ROW 4
+#define N_ROW 16
 #define N_PIXEL (4 * 4)
 
 #define N_READ ((N_PIXEL + 1) * 2 + 1)
-uint8_t rbuf[N_READ];
+/***** Setting Parameter *****/
+#define comparingNumInc 5 // x300 ms   (example) 5 -> 1.5 sec
+#define comparingNumDec 5  // x300 ms   (example) 5 -> 1.5 sec
+#define threshHoldInc 10 //  /10 degC   (example) 10 -> 1.0 degC
+#define threshHoldDec 10 //  /10 degC   (example) 10 -> 1.0 degC
+bool  enablePix[16] = {true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true};
+/****************************/
 
+uint8_t rbuf[N_READ];
+int16_t pix_data[16] = {0};
+int16_t seqData[16][40] = {0};
+bool  occuPix[16] = {0};
+bool  occuPixFlag = false;
+uint8_t  resultOccupancy = 0;
+uint16_t  totalCount = 0;
+
+/** JUDGE_occupancy: judge occupancy*/
+bool judge_seatOccupancy(void) { 
+  int i = 0;
+  int j = 0; 
+  for (i = 0; i < 16; i++){
+    for (j = 0; j < 39; j++){
+      seqData[i][39 - j] = seqData[i][38 - j];
+    }
+    seqData[i][0] = pix_data[i];            
+  }
+  if (totalCount <= comparingNumInc){
+    totalCount++;
+  }
+  if (totalCount > comparingNumInc){
+    for (i = 0; i < 16; i++){
+      if (enablePix[i] == true){
+        if (occuPix[i] == false){
+          if ((int16_t)(seqData[i][0] - seqData[i][comparingNumInc]) > (int16_t)threshHoldInc){
+            occuPix[i] = true;
+          }
+        }
+        else{   
+          if ((int16_t)(seqData[i][comparingNumDec] - seqData[i][0]) > (int16_t)threshHoldDec){
+            occuPix[i] = false;
+          }
+        }
+      }
+    }
+    if (resultOccupancy == 0) {
+      for (i = 0; i < 16; i++){                   
+        if(occuPix[i] == true){
+          resultOccupancy = 1;
+          break;
+        }
+      }
+    }
+    else{  //resultOccupancy == true
+      occuPixFlag = false;
+      for (i = 0; i < 16; i++){
+        if (occuPix[i] == true){
+          occuPixFlag = true;
+          break;
+        }
+        else{                            
+        }
+      }
+      if (occuPixFlag == false){
+        resultOccupancy = 0;
+      }
+    }
+  }
+  return true;
+}
 
 uint8_t calc_crc(uint8_t data) {
     int index;
@@ -95,6 +162,7 @@ void setup() {
  */
 void loop() {
     int i, j;
+  int jj;
 
     memset(rbuf, 0, N_READ);
     // Wire buffers are enough to read D6T-16L data (33bytes) with
@@ -117,18 +185,24 @@ void loop() {
     // 1st data is PTAT measurement (: Proportional To Absolute Temperature)
     int16_t itemp = conv8us_s16_le(rbuf, 0);
     Serial.print("PTAT:");
-    Serial.println(itemp / 10.0, 1);
+    Serial.print(itemp / 10.0, 1);
+    Serial.print(", Temperature:");
 
     // loop temperature pixels of each thrmopiles measurements
     for (i = 0, j = 2; i < N_PIXEL; i++, j += 2) {
         itemp = conv8us_s16_le(rbuf, j);
+        pix_data[i] = itemp;
         Serial.print(itemp / 10.0, 1);  // print PTAT & Temperature
-        if ((i % N_ROW) == N_ROW - 1) {
-            Serial.println(" [degC]");  // wrap text at ROW end.
-        } else {
+    if ((i % N_ROW) == N_ROW - 1) {
+            Serial.print(" [degC]");  // wrap text at ROW end.
+        } 
+     else {
             Serial.print(",");   // print delimiter
         }
     }
-    delay(1000);
+    judge_seatOccupancy(); //add
+    Serial.print(", Occupancy:");
+    Serial.println(resultOccupancy, 1);
+    delay(300);
 }
 // vi: ft=arduino:fdm=marker:et:sw=4:tw=80
