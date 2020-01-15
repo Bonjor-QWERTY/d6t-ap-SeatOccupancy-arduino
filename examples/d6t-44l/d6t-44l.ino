@@ -197,7 +197,7 @@ void loop() {
             Serial.print(" [degC]");  // wrap text at ROW end.
         } 
      else {
-            Serial.print(",");   // print delimiter
+            Serial.print(", ");   // print delimiter
         }
     }
     judge_seatOccupancy(); //add
