@@ -31,14 +31,52 @@
 
 #define N_ROW 1
 #define N_PIXEL 1
-
 #define N_READ ((N_PIXEL + 1) * 2 + 1)
-/***** Setting Parameter *****/
-#define comparingNumInc 8 // x200 ms   (example) 8 -> 1.6 sec
-#define comparingNumDec 8  // x200 ms   (example) 8 -> 1.6 sec
-#define threshHoldInc 10 //  /10 degC   (example) 10 -> 1.0 degC
-#define threshHoldDec 10 //  /10 degC   (example) 10 -> 1.0 degC
+
+#define SAMPLE_TIME_0040MS	40
+#define SAMPLE_TIME_0060MS	60
+#define SAMPLE_TIME_0100MS	100
+#define SAMPLE_TIME_0200MS	200
+#define SAMPLE_TIME_0400MS	400
+#define SAMPLE_TIME_0800MS	800
+#define SAMPLE_TIME_1600MS	1600
+#define SAMPLE_TIME_3200MS	3200
+
+#define PARA_0040MS_1	((uint8_t)0x90)
+#define PARA_0040MS_2	((uint8_t)0xD8)
+#define PARA_0040MS_3	((uint8_t)0x18)
+#define PARA_0060MS_1	((uint8_t)0x90)
+#define PARA_0060MS_2	((uint8_t)0xD9)
+#define PARA_0060MS_3	((uint8_t)0x1F)
+#define PARA_0100MS_1	((uint8_t)0x90)
+#define PARA_0100MS_2	((uint8_t)0xDA)
+#define PARA_0100MS_3	((uint8_t)0x16)
+#define PARA_0200MS_1	((uint8_t)0x90)
+#define PARA_0200MS_2	((uint8_t)0xDB)
+#define PARA_0200MS_3	((uint8_t)0x11)
+#define PARA_0400MS_1	((uint8_t)0x90)
+#define PARA_0400MS_2	((uint8_t)0xDC)
+#define PARA_0400MS_3	((uint8_t)0x04)
+#define PARA_0800MS_1	((uint8_t)0x90)
+#define PARA_0800MS_2	((uint8_t)0xDD)
+#define PARA_0800MS_3	((uint8_t)0x03)
+#define PARA_1600MS_1	((uint8_t)0x90)
+#define PARA_1600MS_2	((uint8_t)0xDE)
+#define PARA_1600MS_3	((uint8_t)0x0A)
+#define PARA_3200MS_1	((uint8_t)0x90)
+#define PARA_3200MS_2	((uint8_t)0xDF)
+#define PARA_3200MS_3	((uint8_t)0x0D)
+
+/***** Setting Parameter 1 *****/
+#define comparingNumInc 8 // x samplingTime ms   (example) 8 x 200 ms -> 1.6 sec
+#define comparingNumDec 8  // x samplingTime ms   (example) 8 x 200 ms -> 1.6 sec
+#define threshHoldInc 10 //  /10 degC   (example) 10 -> 1.0 degC (temperature change > 1.0 degC -> Enable)  
+#define threshHoldDec 10 //  /10 degC   (example) 10 -> 1.0 degC (temperature change > 1.0 degC -> Disable)
 //bool  enablePix[8] = {true, true, true, true, true, true, true, true};
+/****************************/
+
+/***** Setting Parameter 2 *****/
+#define samplingTime SAMPLE_TIME_0200MS //ms (Can select only, 40ms, 60ms, 100ms, 200ms, 400ms, 800ms, 1600ms, 3200ms)
 /****************************/
 
 uint8_t rbuf[N_READ];
@@ -136,8 +174,89 @@ int16_t conv8us_s16_le(uint8_t* buf, int n) {
  * 2. initialize an I2C peripheral.
  */
 void setup() {
+	uint8_t para[3] = {0};
+	switch(samplingTime){
+		case SAMPLE_TIME_0040MS:
+			para[0] = PARA_0040MS_1;
+			para[1] = PARA_0040MS_2;
+			para[2] = PARA_0040MS_3;
+			break;
+		case SAMPLE_TIME_0060MS:
+			para[0] = PARA_0060MS_1;
+			para[1] = PARA_0060MS_2;
+			para[2] = PARA_0060MS_3;
+			break;
+		case SAMPLE_TIME_0100MS:
+			para[0] = PARA_0100MS_1;
+			para[1] = PARA_0100MS_2;
+			para[2] = PARA_0100MS_3;
+			break;
+		case SAMPLE_TIME_0200MS:
+			para[0] = PARA_0200MS_1;
+			para[1] = PARA_0200MS_2;
+			para[2] = PARA_0200MS_3;
+			break;
+		case SAMPLE_TIME_0400MS:
+			para[0] = PARA_0400MS_1;
+			para[1] = PARA_0400MS_2;
+			para[2] = PARA_0400MS_3;
+			break;
+		case SAMPLE_TIME_0800MS:
+			para[0] = PARA_0800MS_1;
+			para[1] = PARA_0800MS_2;
+			para[2] = PARA_0800MS_3;
+			break;
+		case SAMPLE_TIME_1600MS:
+			para[0] = PARA_1600MS_1;
+			para[1] = PARA_1600MS_2;
+			para[2] = PARA_1600MS_3;
+			break;
+		case SAMPLE_TIME_3200MS:
+			para[0] = PARA_3200MS_1;
+			para[1] = PARA_3200MS_2;
+			para[2] = PARA_3200MS_3;
+			break;
+		default:
+			para[0] = PARA_0040MS_1;
+			para[1] = PARA_0040MS_2;
+			para[2] = PARA_0040MS_3;
+			break;
+	}
+	
     Serial.begin(115200);  // Serial baudrate = 115200bps
     Wire.begin();  // i2c master
+
+    Wire.beginTransmission(D6T_ADDR);  // I2C client address
+    Wire.write(0x02);                  // D6T register
+    Wire.write(0x00);                  // D6T register
+    Wire.write(0x01);                  // D6T register
+    Wire.write(0xEE);                  // D6T register
+    Wire.endTransmission();            // I2C repeated start for read
+    Wire.beginTransmission(D6T_ADDR);  // I2C client address
+    Wire.write(0x05);                  // D6T register
+    Wire.write(para[0]);                  // D6T register
+    Wire.write(para[1]);                  // D6T register
+    Wire.write(para[2]);                  // D6T register
+    Wire.endTransmission();            // I2C repeated start for read
+    Wire.beginTransmission(D6T_ADDR);  // I2C client address
+    Wire.write(0x03);                  // D6T register
+    Wire.write(0x00);                  // D6T register
+    Wire.write(0x03);                  // D6T register
+    Wire.write(0x8B);                  // D6T register
+    Wire.endTransmission();            // I2C repeated start for read
+    Wire.beginTransmission(D6T_ADDR);  // I2C client address
+    Wire.write(0x03);                  // D6T register
+    Wire.write(0x00);                  // D6T register
+    Wire.write(0x07);                  // D6T register
+    Wire.write(0x97);                  // D6T register
+    Wire.endTransmission();            // I2C repeated start for read
+    Wire.beginTransmission(D6T_ADDR);  // I2C client address
+    Wire.write(0x02);                  // D6T register
+    Wire.write(0x00);                  // D6T register
+    Wire.write(0x00);                  // D6T register
+    Wire.write(0xE9);                  // D6T register
+    Wire.endTransmission();            // I2C repeated start for read	
+	
 }
 
 
@@ -185,6 +304,6 @@ void loop() {
     judge_seatOccupancy(); //add
     Serial.print(", Occupancy:");
     Serial.println(resultOccupancy, 1);
-    delay(200);
+    delay(samplingTime);
 }
 // vi: ft=arduino:fdm=marker:et:sw=4:tw=80
