@@ -262,7 +262,7 @@ void setup() {
 			para[2] = PARA_3200MS_3;
 			break;
 		default:
-			para[0] = PARA_01000MS_1;
+			para[0] = PARA_0100MS_1;
 			para[1] = PARA_0100MS_2;
 			para[2] = PARA_0100MS_3;
 			break;
