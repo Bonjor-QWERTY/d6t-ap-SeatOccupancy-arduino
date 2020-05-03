@@ -88,8 +88,8 @@
 #define PARA_2000MS_3	((uint8_t)0xA3)
 
 /***** Setting Parameter *****/
-#define comparingNumInc 6  // x samplingTime ms   (example) 6 x 250 ms -> 1.5 sec
-#define comparingNumDec 6  // x samplingTime ms   (example) 6 x 250 ms -> 1.5 sec
+#define comparingNumInc 6  // x samplingTime ms  (range: 1 to 39)   (example) 6 x 250 ms -> 1.5 sec
+#define comparingNumDec 6  // x samplingTime ms  (range: 1 to 39)   (example) 6 x 250 ms -> 1.5 sec
 #define threshHoldInc 10 //  /10 degC   (example) 10 -> 1.0 degC (temperature change > 1.0 degC -> Enable) 
 #define threshHoldDec 10 //  /10 degC   (example) 10 -> 1.0 degC (temperature change > 1.0 degC -> Enable) 
 bool  enablePix[8] = {true, true, true, true, true, true, true, true};
