@@ -33,6 +33,11 @@
 #define N_PIXEL 1
 #define N_READ ((N_PIXEL + 1) * 2 + 1)
 
+#define SAMPLE_TIME_0009MS	9
+#define SAMPLE_TIME_0010MS	10
+#define SAMPLE_TIME_0012MS	12
+#define SAMPLE_TIME_0015MS	15
+#define SAMPLE_TIME_0020MS	20
 #define SAMPLE_TIME_0040MS	40
 #define SAMPLE_TIME_0060MS	60
 #define SAMPLE_TIME_0100MS	100
@@ -42,6 +47,21 @@
 #define SAMPLE_TIME_1600MS	1600
 #define SAMPLE_TIME_3200MS	3200
 
+#define PARA_0009MS_1	((uint8_t)0x90)
+#define PARA_0009MS_2	((uint8_t)0xD3)
+#define PARA_0009MS_3	((uint8_t)0x29)
+#define PARA_0010MS_1	((uint8_t)0x90)
+#define PARA_0010MS_2	((uint8_t)0xD4)
+#define PARA_0010MS_3	((uint8_t)0x3C)
+#define PARA_0012MS_1	((uint8_t)0x90)
+#define PARA_0012MS_2	((uint8_t)0xD5)
+#define PARA_0012MS_3	((uint8_t)0x3B)
+#define PARA_0015MS_1	((uint8_t)0x90)
+#define PARA_0015MS_2	((uint8_t)0xD6)
+#define PARA_0015MS_3	((uint8_t)0x32)
+#define PARA_0020MS_1	((uint8_t)0x90)
+#define PARA_0020MS_2	((uint8_t)0xD7)
+#define PARA_0020MS_3	((uint8_t)0x35)
 #define PARA_0040MS_1	((uint8_t)0x90)
 #define PARA_0040MS_2	((uint8_t)0xD8)
 #define PARA_0040MS_3	((uint8_t)0x18)
@@ -68,15 +88,15 @@
 #define PARA_3200MS_3	((uint8_t)0x0D)
 
 /***** Setting Parameter 1 *****/
-#define comparingNumInc 8 // x samplingTime ms   (example) 8 x 200 ms -> 1.6 sec
-#define comparingNumDec 8  // x samplingTime ms   (example) 8 x 200 ms -> 1.6 sec
+#define comparingNumInc 16 // x samplingTime ms   (example) 16 x 100 ms -> 1.6 sec
+#define comparingNumDec 16  // x samplingTime ms   (example) 16 x 100 ms -> 1.6 sec
 #define threshHoldInc 10 //  /10 degC   (example) 10 -> 1.0 degC (temperature change > 1.0 degC -> Enable)  
 #define threshHoldDec 10 //  /10 degC   (example) 10 -> 1.0 degC (temperature change > 1.0 degC -> Disable)
 //bool  enablePix[8] = {true, true, true, true, true, true, true, true};
 /****************************/
 
 /***** Setting Parameter 2 *****/
-#define samplingTime SAMPLE_TIME_0200MS //ms (Can select only, 40ms, 60ms, 100ms, 200ms, 400ms, 800ms, 1600ms, 3200ms)
+#define samplingTime SAMPLE_TIME_0100MS //ms (Can select only, 9ms, 10ms, 12ms, 15ms, 20ms, 40ms, 60ms, 100ms, 200ms, 400ms, 800ms, 1600ms, 3200ms)
 /****************************/
 
 uint8_t rbuf[N_READ];
@@ -176,6 +196,31 @@ int16_t conv8us_s16_le(uint8_t* buf, int n) {
 void setup() {
 	uint8_t para[3] = {0};
 	switch(samplingTime){
+		case SAMPLE_TIME_0009MS:
+			para[0] = PARA_0009MS_1;
+			para[1] = PARA_0009MS_2;
+			para[2] = PARA_0009MS_3;
+			break;
+		case SAMPLE_TIME_0010MS:
+			para[0] = PARA_0010MS_1;
+			para[1] = PARA_0010MS_2;
+			para[2] = PARA_0010MS_3;
+			break;
+		case SAMPLE_TIME_0012MS:
+			para[0] = PARA_0012MS_1;
+			para[1] = PARA_0012MS_2;
+			para[2] = PARA_0012MS_3;
+			break;
+		case SAMPLE_TIME_0015MS:
+			para[0] = PARA_0015MS_1;
+			para[1] = PARA_0015MS_2;
+			para[2] = PARA_0015MS_3;
+			break;
+		case SAMPLE_TIME_0020MS:
+			para[0] = PARA_0020MS_1;
+			para[1] = PARA_0020MS_2;
+			para[2] = PARA_0020MS_3;
+			break;
 		case SAMPLE_TIME_0040MS:
 			para[0] = PARA_0040MS_1;
 			para[1] = PARA_0040MS_2;
@@ -217,9 +262,9 @@ void setup() {
 			para[2] = PARA_3200MS_3;
 			break;
 		default:
-			para[0] = PARA_0040MS_1;
-			para[1] = PARA_0040MS_2;
-			para[2] = PARA_0040MS_3;
+			para[0] = PARA_01000MS_1;
+			para[1] = PARA_0100MS_2;
+			para[2] = PARA_0100MS_3;
 			break;
 	}
 	
