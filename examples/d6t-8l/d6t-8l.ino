@@ -80,12 +80,12 @@
 #define PARA_2000MS_1	((uint8_t)0x90)
 #define PARA_2000MS_2	((uint8_t)0x3D)
 #define PARA_2000MS_3	((uint8_t)0xAD)
-#define PARA_2000MS_1	((uint8_t)0x90)
-#define PARA_2000MS_2	((uint8_t)0x3E)
-#define PARA_2000MS_3	((uint8_t)0xA4)
-#define PARA_2000MS_1	((uint8_t)0x90)
-#define PARA_2000MS_2	((uint8_t)0x3F)
-#define PARA_2000MS_3	((uint8_t)0xA3)
+#define PARA_4000MS_1	((uint8_t)0x90)
+#define PARA_4000MS_2	((uint8_t)0x3E)
+#define PARA_4000MS_3	((uint8_t)0xA4)
+#define PARA_8000MS_1	((uint8_t)0x90)
+#define PARA_8000MS_2	((uint8_t)0x3F)
+#define PARA_8000MS_3	((uint8_t)0xA3)
 
 /***** Setting Parameter *****/
 #define comparingNumInc 6  // x samplingTime ms  (range: 1 to 39)   (example) 6 x 250 ms -> 1.5 sec
